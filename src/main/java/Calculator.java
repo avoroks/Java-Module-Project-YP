@@ -9,7 +9,7 @@ public class Calculator {
 
     private static final String START_TEXT = "Для добавления нового товара введите его название и стоимость в формате: <НАЗВАНИЕ РУБЛИ.КОПЕЙКИ> и нажмите <Enter>. " +
             "Пример: <кофе 150.05>. Если вы закончили добавлять товары, то введите: <завершить>.";
-    private static final String PATTERN = "(\\p{L}+(\\s+\\p{L}+)*)*\\s+([0-9]+\\.[0-9]{2})";
+    private static final String PATTERN = "(.+(\\s+.+)*)*\\s+([0-9]+\\.[0-9]{2})$";
 
     public List<Product> products = new ArrayList<>();
 
@@ -26,13 +26,13 @@ public class Calculator {
                 Matcher matcher = pattern.matcher(line);
 
                 if (matcher.find()) {
-                    products.add(new Product(matcher.group(1), Double.valueOf(matcher.group(3))));
-                    System.out.println("Отлично. Добавили продукт с именем = '" + matcher.group(1) + "' и стоимостью = " + matcher.group(3) + ". Добавляйте продукты еще или напишите <завершить>.");
+                    var productNameWithoutSpaces = matcher.group(1).trim();
+                    if (productNameWithoutSpaces.length() == 0) throw new IllegalArgumentException("Недопустимый продукт");
+                    products.add(new Product(productNameWithoutSpaces, Double.valueOf(matcher.group(3))));
+                    System.out.println("Отлично. Добавили продукт с именем = '" + productNameWithoutSpaces + "' и стоимостью = " + matcher.group(3) + ". Добавляйте продукты еще или напишите <завершить>.");
                 } else System.out.println("Что-то не так. " + START_TEXT);
-
             } catch (Exception __) {
                 System.out.println("Что-то не так. " + START_TEXT);
-                Main.scanner.nextLine();
             }
         }
     }
